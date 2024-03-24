@@ -137,8 +137,8 @@ echo "downloading custom nodes"
 #cd custom_nodes
 
 clone_or_update_repo_and_install_requirements "https://github.com/ltdrdata/ComfyUI-Manager.git" "custom_nodes/ComfyUI-Manager"
-clone_or_update_repo_and_install_requirements "https://github.com/ltdrdata/ComfyUI-Impactack"  "custom_nodes/ComfyUI-Impactack" 
-clone_or_update_repo_and_install_requirements "https://github.com/ltdrdata/ComfyUI-Inspireack"  "custom_nodes/ComfyUI-Inspireack" 
+clone_or_update_repo_and_install_requirements "https://github.com/ltdrdata/ComfyUI-Impact-Pack"  "custom_nodes/ComfyUI-Impactack" 
+clone_or_update_repo_and_install_requirements "https://github.com/ltdrdata/ComfyUI-Inspire-Pack"  "custom_nodes/ComfyUI-Inspireack" 
 clone_or_update_repo_and_install_requirements "https://github.com/Fannovel16/ComfyUI-Frame-Interpolation"  "custom_nodes/ComfyUI-Frame-Interpolation" 
 clone_or_update_repo_and_install_requirements "https://github.com/Fannovel16/ComfyUI-Video-Matting"  "custom_nodes/ComfyUI-Video-Matting" 
 clone_or_update_repo_and_install_requirements "https://github.com/BlenderNeko/ComfyUI_Cutoff" "custom_nodes/ComfyUI_Cutoff"
