@@ -5,9 +5,9 @@ services:
       context: .
       dockerfile: Dockerfile
     runtime: nvidia
-    volumes:
-      - ./scripts/entrypoint.sh:/app/entrypoint.sh
-    entrypoint: /app/entrypoint.sh
+    #volumes:
+    #  - ./scripts/entrypoint.sh:/app/entrypoint.sh
+    #entrypoint: /app/entrypoint.sh
     environment:
       - NVIDIA_VISIBLE_DEVICES=all
     # Add any additional configuration options for the comfy service here
