@@ -1,0 +1,16 @@
+version: '3.9'
+services:
+  comfy:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    runtime: nvidia
+    volumes:
+      - ./scripts/entrypoint.sh:/app/entrypoint.sh
+    entrypoint: /app/entrypoint.sh
+    environment:
+      - NVIDIA_VISIBLE_DEVICES=all
+    # Add any additional configuration options for the comfy service here
+    restart: unless-stopped
+    ports:
+      - 8188:8188

@@ -85,8 +85,14 @@ RUN git clone "https://github.com/Kosinkadink/ComfyUI-VideoHelperSuite" && \
     cd ComfyUI-VideoHelperSuite && \
     git reset --hard f94597739f20dac331f9918a245149b6b00a60f2 && \
     pip install --no-cache -r requirements.txt
+RUN git clone --depth=1 --no-tags --recurse-submodules --shallow-submodules \
+    "https://github.com/ltdrdata/ComfyUI-Manager.git" && \
+    cd ComfyUI-Manager && \
+    pip install --no-cache -r requirements.txt
+
 
 COPY --chown=user:user ./ ComfyUI-3D-Pack/
+
 
 WORKDIR /app
 ENTRYPOINT [ "python", "main.py", "--listen", "0.0.0.0" ]
