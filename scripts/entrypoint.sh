@@ -1,5 +1,6 @@
 #!/bin/bash
 
+
 download_hf_model() {
     # Extracts the model name from the URL
     model_name=$(basename $1)
@@ -57,11 +58,14 @@ download_civitai_model() {
 
 
 clone_or_update_repo_and_install_requirements() {
-    repo_url=$1
-    target_directory=$2
+    local repo_url="${1}"
+    local target_directory="${2}"
+    local original_directory=$(pwd)  # Store the current directory
 
-    # Store the current directory
-    original_directory=$(pwd)
+    # Ensure the target directory is an absolute path
+    if [[ ! "$target_directory" = /* ]]; then
+        target_directory="$original_directory/$target_directory"
+    fi
 
     # Check if the target directory already exists
     if [ ! -d "$target_directory" ]; then
@@ -70,6 +74,7 @@ clone_or_update_repo_and_install_requirements() {
         git clone --depth=1 --no-tags --recurse-submodules --shallow-submodules "$repo_url" "$target_directory"
         if [ $? -ne 0 ]; then
             echo "Failed to clone repository."
+            cd "$original_directory"
             return 1
         fi
     else
@@ -78,22 +83,28 @@ clone_or_update_repo_and_install_requirements() {
         cd "$target_directory" && git pull
         if [ $? -ne 0 ]; then
             echo "Failed to update repository."
+            cd "$original_directory"
             return 1
         fi
     fi
 
     # Change to the target directory
-    echo "Changing to directory $target_directory"
     cd "$target_directory"
 
     # Install Python dependencies from requirements.txt
-    echo "Installing Python dependencies from requirements.txt..."
-    pip install -r requirements.txt
-    if [ $? -ne 0 ]; then
-        echo "Failed to install Python dependencies."
-        return 1
+    if [ -f "requirements.txt" ]; then
+        echo "Installing Python dependencies from requirements.txt..."
+        pip install -r requirements.txt
+        if [ $? -ne 0 ]; then
+            echo "Failed to install Python dependencies."
+            cd "$original_directory"
+            return 1
+        fi
+    else
+        echo "No requirements.txt found."
     fi
 
+    # Change back to the original directory
     cd "$original_directory"
     echo "Repository setup and dependencies installed successfully."
 }
@@ -205,7 +216,7 @@ clone_or_update_repo_and_install_requirements "https://github.com/Acly/comfyui-i
 clone_or_update_repo_and_install_requirements "https://github.com/chflame163/ComfyUI_LayerStyle" "custom_nodes/ComfyUI_LayerStyle"  
 clone_or_update_repo_and_install_requirements "https://github.com/omar92/ComfyUI-QualityOfLifeSuit_Omar92" "custom_nodes/ComfyUI-QualityOfLifeSuit_Omar92"
 clone_or_update_repo_and_install_requirements "https://github.com/Derfuu/Derfuu_ComfyUI_ModdedNodes" "custom_nodes/Derfuu_ComfyUI_ModdedNodes"
-clone_or_update_repo_and_install_requirements "https://github.com/EllangoK/ComfyUIostrocessing-nodes" "custom_nodes/ComfyUIostrocessing-nodes"
+clone_or_update_repo_and_install_requirements "https://github.com/EllangoK/ComfyUI-Post-Processing-nodes" "custom_nodes/ComfyUI-Post-Processing-nodes"
 clone_or_update_repo_and_install_requirements "https://github.com/jags111/ComfyUI_Jags_VectorMagic" "custom_nodes/ComfyUI_Jags_VectorMagic"
 clone_or_update_repo_and_install_requirements "https://github.com/melMass/comfy_mtb"   "custom_nodes/comfy_mtb"  
 clone_or_update_repo_and_install_requirements "https://github.com/AuroBit/ComfyUI-OOTDiffusion"   "custom_nodes/ComfyUI-OOTDiffusion"  
@@ -221,17 +232,17 @@ clone_or_update_repo_and_install_requirements "https://github.com/ZHO-ZHO-ZHO/Co
 
 echo "Downloading AnimateDiff Models..."  
 
-download_hf_model  "https://huggingface.co/hotshotco/Hotshot-XL/resolve/main/hsxl_temporal_layers.f16.safetensors"  "custom_nodes/ComfyUI-AnimateDiff-Evolved/models/" 
-download_hf_model  "https://huggingface.co/hotshotco/SDXL-512/resolve/main/hsxl_base_1.0.f16.safetensors"  "custom_nodes/ComfyUI-AnimateDiff-Evolved/models/" 
-download_hf_model  "https://huggingface.co/guoyww/animatediff/resolve/main/mm_sd_v15.ckpt"  "custom_nodes/ComfyUI-AnimateDiff-Evolved/models/" 
-download_hf_model  "https://huggingface.co/guoyww/animatediff/resolve/main/mm_sd_v15_v2.ckpt"  "custom_nodes/ComfyUI-AnimateDiff-Evolved/models/" 
-download_hf_model  "https://huggingface.co/guoyww/animatediff/resolve/main/v3_sd15_mm.ckpt"  "custom_nodes/ComfyUI-AnimateDiff-Evolved/models/" 
-download_hf_model  "https://huggingface.co/guoyww/animatediff/resolve/main/v3_sd15_sparsectrl_rgb.ckpt"  "custom_nodes/ComfyUI-AnimateDiff-Evolved/models/" 
-download_hf_model  "https://huggingface.co/guoyww/animatediff/resolve/main/v3_sd15_sparsectrl_scribble.ckpt"  "custom_nodes/ComfyUI-AnimateDiff-Evolved/models/" 
-download_hf_model  "https://huggingface.co/ByteDance/AnimateDiff-Lightning/resolve/main/animatediff_lightning_8step_comfyui.safetensors"  "custom_nodes/ComfyUI-AnimateDiff-Evolved/models/"  
-download_hf_model  "https://huggingface.co/ByteDance/AnimateDiff-Lightning/resolve/main/animatediff_lightning_4step_comfyui.safetensors"  "custom_nodes/ComfyUI-AnimateDiff-Evolved/models/"
-download_hf_model  "https://huggingface.co/ByteDance/AnimateDiff-Lightning/resolve/main/animatediff_lightning_2step_comfyui.safetensors"  "custom_nodes/ComfyUI-AnimateDiff-Evolved/models/"
-download_hf_model  "https://huggingface.co/ByteDance/AnimateDiff-Lightning/resolve/main/animatediff_lightning_1step_comfyui.safetensors"  "custom_nodes/ComfyUI-AnimateDiff-Evolved/models/"
+download_hf_model  "https://huggingface.co/hotshotco/Hotshot-XL/resolve/main/hsxl_temporal_layers.f16.safetensors"  "custom_nodes/ComfyUI-AnimateDiff-Evolved/models" 
+download_hf_model  "https://huggingface.co/hotshotco/SDXL-512/resolve/main/hsxl_base_1.0.f16.safetensors"  "custom_nodes/ComfyUI-AnimateDiff-Evolved/models" 
+download_hf_model  "https://huggingface.co/guoyww/animatediff/resolve/main/mm_sd_v15.ckpt"  "custom_nodes/ComfyUI-AnimateDiff-Evolved/models" 
+download_hf_model  "https://huggingface.co/guoyww/animatediff/resolve/main/mm_sd_v15_v2.ckpt"  "custom_nodes/ComfyUI-AnimateDiff-Evolved/models" 
+download_hf_model  "https://huggingface.co/guoyww/animatediff/resolve/main/v3_sd15_mm.ckpt"  "custom_nodes/ComfyUI-AnimateDiff-Evolved/models" 
+download_hf_model  "https://huggingface.co/guoyww/animatediff/resolve/main/v3_sd15_sparsectrl_rgb.ckpt"  "custom_nodes/ComfyUI-AnimateDiff-Evolved/models" 
+download_hf_model  "https://huggingface.co/guoyww/animatediff/resolve/main/v3_sd15_sparsectrl_scribble.ckpt"  "custom_nodes/ComfyUI-AnimateDiff-Evolved/models" 
+download_hf_model  "https://huggingface.co/ByteDance/AnimateDiff-Lightning/resolve/main/animatediff_lightning_8step_comfyui.safetensors"  "custom_nodes/ComfyUI-AnimateDiff-Evolved/models"  
+download_hf_model  "https://huggingface.co/ByteDance/AnimateDiff-Lightning/resolve/main/animatediff_lightning_4step_comfyui.safetensors"  "custom_nodes/ComfyUI-AnimateDiff-Evolved/models"
+download_hf_model  "https://huggingface.co/ByteDance/AnimateDiff-Lightning/resolve/main/animatediff_lightning_2step_comfyui.safetensors"  "custom_nodes/ComfyUI-AnimateDiff-Evolved/models"
+download_hf_model  "https://huggingface.co/ByteDance/AnimateDiff-Lightning/resolve/main/animatediff_lightning_1step_comfyui.safetensors"  "custom_nodes/ComfyUI-AnimateDiff-Evolved/models"
 
 echo "Downloading Vae..."  
 
@@ -275,13 +286,13 @@ download_hf_model  https://huggingface.co/cjpais/llava-1.6-mistral-7b-gguf/resol
 download_hf_model  https://huggingface.co/cjpais/llava-1.6-mistral-7b-gguf/resolve/main/llava-v1.6-mistral-7b.Q3_K_M.gguf  "models/LLavacheckpoints" 
 
 echo "Downloading IPAdapter Plus..."  
-download_hf_model  https://huggingface.co/h94/IP-Adapter/resolve/main/sdxl_models/ip-adapterlus-face_sdxl_vit-h.safetensors  "custom_nodes/ComfyUI_IPAdapter_plus/models/" 
-download_hf_model  "https://huggingface.co/h94/IP-Adapter/resolve/main/sdxl_models/ip-adapterlus_sdxl_vit-h.safetensors"  "custom_nodes/ComfyUI_IPAdapter_plus/models/" 
-download_hf_model  "https://huggingface.co/h94/IP-Adapter/resolve/main/models/ip-adapterlus-face_sd15.safetensors"  "custom_nodes/ComfyUI_IPAdapter_plus/models/" 
-download_hf_model  "https://huggingface.co/h94/IP-Adapter/resolve/main/models/ip-adapterlus_sd15.safetensors"  "custom_nodes/ComfyUI_IPAdapter_plus/models/" 
-download_hf_model  "https://huggingface.co/h94/IP-Adapter-FaceID/resolve/main/ip-adapter-faceidlusv2_sd15.bin"  "custom_nodes/ComfyUI_IPAdapter_plus/models/" 
-download_hf_model  "https://huggingface.co/ArtGAN/Controlnet/resolve/main/ip-adapter_sdxl.safetensors"  "custom_nodes/ComfyUI_IPAdapter_plus/models/" 
-download_hf_model  "https://huggingface.co/ostris/ip-composition-adapter/resolve/main/ip_plus_composition_sdxl.safetensors"  "custom_nodes/ComfyUI_IPAdapter_plus/models/" 
+download_hf_model  https://huggingface.co/h94/IP-Adapter/resolve/main/sdxl_models/ip-adapterlus-face_sdxl_vit-h.safetensors  "custom_nodes/ComfyUI_IPAdapter_plus/models" 
+download_hf_model  "https://huggingface.co/h94/IP-Adapter/resolve/main/sdxl_models/ip-adapterlus_sdxl_vit-h.safetensors"  "custom_nodes/ComfyUI_IPAdapter_plus/models" 
+download_hf_model  "https://huggingface.co/h94/IP-Adapter/resolve/main/models/ip-adapterlus-face_sd15.safetensors"  "custom_nodes/ComfyUI_IPAdapter_plus/models" 
+download_hf_model  "https://huggingface.co/h94/IP-Adapter/resolve/main/models/ip-adapterlus_sd15.safetensors"  "custom_nodes/ComfyUI_IPAdapter_plus/models" 
+download_hf_model  "https://huggingface.co/h94/IP-Adapter-FaceID/resolve/main/ip-adapter-faceidlusv2_sd15.bin"  "custom_nodes/ComfyUI_IPAdapter_plus/models" 
+download_hf_model  "https://huggingface.co/ArtGAN/Controlnet/resolve/main/ip-adapter_sdxl.safetensors"  "custom_nodes/ComfyUI_IPAdapter_plus/models" 
+download_hf_model  "https://huggingface.co/ostris/ip-composition-adapter/resolve/main/ip_plus_composition_sdxl.safetensors"  "custom_nodes/ComfyUI_IPAdapter_plus/models" 
 
 echo "Downloading ClipVision..."  
 
