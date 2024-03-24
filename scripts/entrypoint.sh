@@ -27,6 +27,34 @@ download_hf_model() {
     fi
 }
 
+download_civitai_model() {
+    local url="${1}"
+    local destination="${2}"
+    local user_agent_string="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36"
+
+    echo "Downloading from ${url}, please wait..."
+
+    # Check if the destination directory does not exist and create it
+    if [ ! -d "${destination}" ]; then
+        mkdir -p "${destination}"
+    fi
+
+    # Change to the destination directory
+    cd "${destination}"
+
+    # Download the file using curl with the specified user agent
+    curl -JsL --remote-name -A "${user_agent_string}" "${url}"
+
+    if [ $? -ne 0 ]; then
+        echo "Failed to download from ${url}."
+        return 1
+    else
+        echo "Download completed successfully."
+    fi
+
+    # Change back to the original directory (optional, based on your use case)
+}
+
 
 clone_or_update_repo_and_install_requirements() {
     repo_url=$1
@@ -207,7 +235,7 @@ download_hf_model  "https://huggingface.co/ByteDance/AnimateDiff-Lightning/resol
 
 echo "Downloading Vae..."  
 
-cd ../
+
 download_hf_model  https://huggingface.co/stabilityai/sd-vae-ft-mse-original/resolve/main/vae-ft-mse-840000-emaruned.safetensors  "models/vae" 
 download_hf_model  https://huggingface.co/ArtGAN/Controlnet/resolve/main/taesdxl.safetensors  "models/vae" 
 download_hf_model  https://huggingface.co/madebyollin/sdxl-vae-fp16-fix/resolve/main/sdxl.vae.safetensors  "models/vae" 
@@ -305,6 +333,6 @@ clone_or_update_repo_and_install_requirements "https://huggingface.co/ViperYX/Bi
 
 
 echo "Starting the server..."
-cd ../
+
 
 python main.py --listen "0.0.0.0"
